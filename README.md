@@ -5,13 +5,13 @@ this tries to make the heavily routined code can be used repeatedly without rewr
 the functions are implemented as wrapper around ROOT (version 6.24, 6.26 expected to be similar),
 either in python (to be used with PyROOT) or in ROOT macros.
 
-the implementations are in: ToolsCollection.h (.py)
+the implementations are in: `ToolsCollection.h (.py)`
 
-the 'tutorial' (actually I tested the functions in the file) are in: ToolsCollection_TestBench.h (.ipynb)
+the 'tutorial' (actually I tested the functions in the file) are in: `ToolsCollection_TestBench.h (.ipynb)`
 
 note:
 
-you are recommended to use the .h, either with another ROOT macro (or c++ based code) or in the PyROOT codes
+you are recommended to use the `ToolsCollection.h`, either with another ROOT macro (or c++ based code) or in the PyROOT codes
 
 currently i was writting in python and translate it into cpp file. if any problem arise in cpp, always check with the py file first.
 
