@@ -4,6 +4,10 @@ this is a collection of packaged functions of frequently used data analysis meth
 the functions are implemented as wrapper around ROOT (version 6.24, 6.26 expected to be similar),
 either in python (to be used with PyROOT) or in ROOT macros.
 
+the implementations are in: ToolsCollection.h (.py)
+the 'tutorial' (actually I tested the functions in the file) are in: ToolsCollection_TestBench.h (.ipynb)
+note: currently i was writting in python and translate it into cpp file. if any problem arise in cpp, always check with the py file first.
+
 # 1. to use with PyROOT,run for example:
 ```
 from root_tools.ToolsCollection import fft
@@ -21,7 +25,7 @@ importlib.reload(tools)
 ## 1.2 if you do not plan to reload
 `import root_tools.ToolsCollection `
 so the function should be called in this way:
-`root_tools.ToolsCollection.fft`
+`root_tools.ToolsCollection.fft(kwargs)`
 
 ## 1.3 or using alias: 
 ```
@@ -30,13 +34,12 @@ tools.fft(kwargs)
 ```
 
 # 2. for the ROOT macro, you can use it in two ways:
-## 2.1 included in another ROOT macro (c++ program file not yet tested)
-just put:
-`#include "ToolsCollection.h"`
+## 2.1 included in another ROOT macro (ROOT-based program file not yet tested)
+just put: `#include "ToolsCollection.h"` in the program file
 
 ## 2.2 use with pyROOT (recommended over the python file import)
 ```
-import ROOT as r
-r.gROOT.ProcessLine(".L ./ToolsCollection.h")
-r.fft(kwargs)
+import ROOT
+ROOT.gROOT.ProcessLine(".L ./ToolsCollection.h")
+ROOT.fft(kwargs)
 ```
