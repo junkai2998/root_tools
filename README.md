@@ -23,9 +23,13 @@ importlib.reload(tools)
 ```
 
 ## 1.2 if you do not plan to reload
-`import root_tools.ToolsCollection `
+```python
+import root_tools.ToolsCollection
+```
 so the function should be called in this way:
-`root_tools.ToolsCollection.fft(kwargs)`
+```python
+root_tools.ToolsCollection.fft(kwargs)
+```
 
 ## 1.3 or using alias: 
 ```python
@@ -35,7 +39,11 @@ tools.fft(kwargs)
 
 # 2. for the ROOT macro, you can use it in two ways:
 ## 2.1 included in another ROOT macro (ROOT-based program file not yet tested)
-just put: `#include "ToolsCollection.h"` in the program file
+just put: 
+```c++
+#include "ToolsCollection.h"
+```
+in the program file
 
 ## 2.2 use with pyROOT (recommended over the python file import)
 ```python
