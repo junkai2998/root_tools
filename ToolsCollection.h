@@ -113,4 +113,36 @@ TH1D* fft2(TH1D* hist, string fftname="default_fft_name", string given_title="FF
     return fft_hist;
 }
 
+
+
+
+void identify_hist_peaks3(TH1D* hist,int maxpositions=3, double resolution=1.0,
+                          double sigma=2.0, string option="", double threshold=0.1,
+                          bool draw=false, bool addToHist=false,
+                          string unit="MHz",int decimal_places=2,
+                          int color=2,int markerstyle=23,double textsize=0.04){
+
+    TSpectrum * peak_finder = new TSpectrum(maxpositions, resolution); // (int maxpositions, double resolution = 1)
+    int npeaks = peak_finder->Search(hist,sigma,option.c_str(),threshold); // int TSpectrum::Search(const TH1* hist, double sigma = 2, const char* option = "", double threshold = 0.050000000000000003)
+    cout << "found " << npeaks << " peak(s) in the range." << endl;
+    TPolyMarker* pm = (TPolyMarker*) hist->FindObject("TPolyMarker");
+    pm->SetMarkerStyle(markerstyle);
+    pm->SetMarkerColor(color);
+
+    if(addToHist){hist->GetListOfFunctions()->Add(pm->Clone()); };
+    if(draw){pm->Draw(); };
+     // caveat: if not draw, the TPoly will resides in the ListOfFunction of that histo.
+     //         if draw, the TPoly need to be attached to the ListOfFunction, in order to be drawn
+
+    // int npeaks = pm->GetN();
+    for (int pk=0; pk<npeaks;pk++){
+        //cout << pm->GetX()[pk] << endl;
+        //TString formatted_text = Form("%.*f %s", decimal_places, pm->GetX()[pk],unit.c_str());
+        TLatex* text = new TLatex(pm->GetX()[pk]*1.05, pm->GetY()[pk]*0.9, Form("%.*f %s", decimal_places, pm->GetX()[pk],unit.c_str()));
+        text->SetTextColor(color);
+        text->SetTextSize(textsize);
+        if(draw){text->DrawClone(); };
+        if(addToHist){hist->GetListOfFunctions()->Add(text); };
+    };
+}
 #endif

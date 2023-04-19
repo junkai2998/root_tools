@@ -109,7 +109,7 @@ def fft2(hist,fftname="default_fft_name",given_title="FFT",fstart=0.01,fft_optio
 
 def identify_hist_peaks(hist,addToHist=False,setting=(3,1,2,0.1)):
     """
-    note: this can only be used during drawing
+    note: this can only be used during drawing of the hist
     """
     peak_finder = r.TSpectrum(setting[0],setting[1])
     peak_finder.Search(hist,setting[2],"",setting[3])
@@ -124,5 +124,65 @@ def identify_hist_peaks(hist,addToHist=False,setting=(3,1,2,0.1)):
         text.SetTextColor(2)
         text.SetTextSize(0.04)
         text.DrawClone();
+        if(addToHist):
+            hist.GetListOfFunctions().Add(text)
+
+
+def identify_hist_peaks2(hist,setting=(3,1,2,0.1),draw=False,addToHist=False,decimal_places=2,unit="MHz",color=2,markerstyle=23,textsize=0.04):
+    """
+    new feature test
+    note: this can only be used during drawing of the hist
+    Tspectrum find peak only scan the peak in the set range of the histogram
+    """
+    peak_finder = r.TSpectrum(setting[0],setting[1])
+    npeaks = peak_finder.Search(hist,setting[2],"",setting[3])
+    print("found {} peaks".format(npeaks))
+    pm = hist.FindObject("TPolyMarker");
+    pm.SetMarkerColor(color)
+    pm.SetMarkerStyle(markerstyle)
+
+    if(addToHist):
+        hist.GetListOfFunctions().Add(pm.Clone())
+    if(draw):
+        pm.Draw() 
+     # caveat: if not draw, the TPoly will resides in the ListOfFunction of that histo.
+     #         if draw, the TPoly need to be attached to the ListOfFunction, in order to be drawn
+
+    for pk in range(pm.GetN()):
+        text = r.TLatex(pm.GetX()[pk]*1.05,pm.GetY()[pk]*0.9,"{:.0{}f} {}".format(pm.GetX()[pk],decimal_places,unit));
+        text.SetTextColor(color)
+        text.SetTextSize(textsize)
+        if(draw):
+            text.DrawClone();
+        if(addToHist):
+            hist.GetListOfFunctions().Add(text)
+
+
+def identify_hist_peaks3(hist, maxpositions=3, resolution = 1.0, sigma = 2.0, option = "", threshold = 0.1, draw=False, addToHist=False, decimal_places=2, unit="MHz", color=2, markerstyle=23, textsize=0.04):
+    """
+    this gives full control. ROOT version still buggy ! in ../test.h, ../test.ipynb
+    note: this can only be used during drawing of the hist
+    Tspectrum find peak only scan the peak in the set range of the histogram
+    """
+    peak_finder = r.TSpectrum(maxpositions, resolution)
+    npeaks = peak_finder.Search(hist,sigma, option, threshold)
+    print("found {} peaks".format(npeaks))
+    pm = hist.FindObject("TPolyMarker");
+    pm.SetMarkerColor(color)
+    pm.SetMarkerStyle(markerstyle)
+
+    if(addToHist):
+        hist.GetListOfFunctions().Add(pm.Clone())
+    if(draw):
+        pm.Draw() 
+     # caveat: if not draw, the TPoly will resides in the ListOfFunction of that histo.
+     #         if draw, the TPoly need to be attached to the ListOfFunction, in order to be drawn
+
+    for pk in range(pm.GetN()):
+        text = r.TLatex(pm.GetX()[pk]*1.05,pm.GetY()[pk]*0.9,"{:.0{}f} {}".format(pm.GetX()[pk],decimal_places,unit));
+        text.SetTextColor(color)
+        text.SetTextSize(textsize)
+        if(draw):
+            text.DrawClone();
         if(addToHist):
             hist.GetListOfFunctions().Add(text)

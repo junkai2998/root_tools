@@ -42,3 +42,51 @@ void testfft(){
         c->Draw();
 
 }
+
+
+void testFindPeaks(){
+    
+int npts = 4000;
+
+TF1* func = new TF1("func","1 + 0.5*cos(14.48*x + 0)",0,npts*0.1492); 
+func->SetNpx(npts*2);
+
+TH1D* hist = new TH1D("hist","hist",npts,0,npts*0.1492);
+    
+int N = 100000;
+for(int i=0;i<N;i++){
+    double t = func->GetRandom();
+    hist->Fill(t);
+    //hist_bin2.Fill(t);
+    //hist_bin4.Fill(t);
+    };
+
+// 	hist->FillRandom("func",N);
+    
+
+TCanvas c = TCanvas("cc","c",400,400);
+TH1D* hist_fft = fft(hist,"fft_name","FFT",0.01); // without new fft(...), because you already have new TH1D in that function !
+
+// this work
+hist_fft->Draw();
+int maxpositions=3;
+double resolution=1.0;
+double sigma=2.0;
+string option="";
+double threshold=0.1;
+bool draw=true;
+bool addToHist=false;
+int decimal_places=1;
+string unit="GHz";
+identify_hist_peaks3(hist_fft,maxpositions,resolution,sigma,option,threshold,draw,addToHist,unit,decimal_places);
+
+
+// void identify_hist_peaks3(TH1D* hist,int maxpositions=3, double resolution=1.0,
+//                           double sigma=2.0, string option="", double threshold=0.1,
+//                           bool draw=false, bool addToHist=false,
+//                           string unit="MHz",int decimal_places=2,
+//                           int color=2,int markerstyle=23,double textsize=0.04){
+
+c.Draw();
+c.Print("testFindPeaks.png");
+}
