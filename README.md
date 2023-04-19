@@ -1,8 +1,7 @@
 # ROOT data analysis helper
 
-this is a collection of packaged functions of frequently used data analysis methods
-this tries to make the heavily routined code can be used repeatedly without rewritten (also prone to error), inspired by [^2]
-the functions are implemented as wrapper around ROOT (version 6.24, 6.26 expected to be similar),
+This is a collection of packaged functions of frequently used data analysis methods.This tries to make the heavily routined code can be used repeatedly without rewritten (also prone to error), inspired by [^2].
+The functions are implemented as wrapper around ROOT (version 6.24, 6.26 expected to behave similarily),
 either in python (to be used with PyROOT) or in ROOT macros.
 
 the implementations are in: `ToolsCollection.h (.py)`
