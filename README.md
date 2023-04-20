@@ -57,6 +57,12 @@ import ROOT
 ROOT.gROOT.ProcessLine(".L ./ToolsCollection.h")
 ROOT.fft(kwargs)
 ```
+the following code also work. But I still need some times to understand the working of c++ compiler and root interpreter[^3]
+```python
+r.gInterpreter.Declare('# include "ToolsCollection.h"')
+# r.gROOT.ProcessLine('# include "ToolsCollection.h"') # also work. but which one is more easy to move to compiled version ?
+```
 
 [^1]: https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
 [^2]: https://github.com/heymanwasup/OmegaFitting/blob/main/Fitter/functions.h
+[^3]: https://root.cern.ch/root/htmldoc/guides/users-guide/ROOTUsersGuide.html#the-c-interpreter-cling
