@@ -145,4 +145,21 @@ void identify_hist_peaks3(TH1D* hist,int maxpositions=3, double resolution=1.0,
         if(addToHist){hist->GetListOfFunctions()->Add(text); };
     };
 }
+
+
+TH1D* GetFitResidual(TH1D* hist, TF1* func, string name="residual", string title="residual (histo - func)"){
+    TH1D* residual = new TH1D(name.c_str(),title.c_str(),hist->GetNbinsX(), hist->GetXaxis()->GetXmin() ,hist->GetXaxis()->GetXmax());
+    residual->GetXaxis()->SetTitle(hist->GetXaxis()->GetTitle());
+    residual->GetYaxis()->SetTitle(hist->GetYaxis()->GetTitle());
+    
+    // TH1D* residual = hist->Clone(name); // faster alternative
+    
+    for (int bin=0; bin < hist->GetNbinsX(); bin++){
+        double residue = hist->GetBinContent(bin+1) - func->Eval(hist->GetBinCenter(bin+1));
+        residual->SetBinContent(bin+1, residue);
+    };
+    
+    return residual;
+}
+
 #endif

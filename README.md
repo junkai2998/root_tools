@@ -63,6 +63,10 @@ r.gInterpreter.Declare('# include "ToolsCollection.h"')
 # r.gROOT.ProcessLine('# include "ToolsCollection.h"') # also work. but which one is more easy to move to compiled version ?
 ```
 
+# 3. known issues
+1. now the fft, residual only support TH1D. tried to use TH1 but got `calling a protected constructor of class 'TH1'` error
+   maybe can overload the functions ?
+
 [^1]: https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
 [^2]: https://github.com/heymanwasup/OmegaFitting/blob/main/Fitter/functions.h
 [^3]: https://root.cern.ch/root/htmldoc/guides/users-guide/ROOTUsersGuide.html#the-c-interpreter-cling

@@ -160,7 +160,7 @@ def identify_hist_peaks2(hist,setting=(3,1,2,0.1),draw=False,addToHist=False,dec
 
 def identify_hist_peaks3(hist, maxpositions=3, resolution = 1.0, sigma = 2.0, option = "", threshold = 0.1, draw=False, addToHist=False, decimal_places=2, unit="MHz", color=2, markerstyle=23, textsize=0.04):
     """
-    this gives full control. ROOT version still buggy ! in ../test.h, ../test.ipynb
+    this gives full control.
     note: this can only be used during drawing of the hist
     Tspectrum find peak only scan the peak in the set range of the histogram
     """
@@ -186,3 +186,98 @@ def identify_hist_peaks3(hist, maxpositions=3, resolution = 1.0, sigma = 2.0, op
             text.DrawClone();
         if(addToHist):
             hist.GetListOfFunctions().Add(text)
+
+
+
+
+def DrawSinglePlotsOnDividedCanvas(arrofPlots,
+              Nplots=24,cvarr=(6,4),cvsize=(3600,2400),cvname="c",
+              plotrangeX=None,plotrangeY=None,drawOpt="",
+              additional_codes=None,Draw=True):
+    """
+    this only draw the plot, with ranges and additional styling provided by the additional_codes
+    also, now the code is aiming at simple plotting, so it is better if the plots are similar (or already formatted), or you have to pass additional_codes to do the formatting
+        
+    if you want to draw something additional such as legend, you better do it outside of the function call, like:
+    
+    '''arrofPlots = res_21apr.GetNvsTime
+    c = Draw24calos(arrofPlots,plotrange=None,Draw=True,cvname="c",cvsize=(3600,2400),cvarr=(6,4),additional_codes=None)
+
+    c.cd()
+    lgd = r.TLegend()
+    lgd.AddEntry(res_21apr.GetNvsTime[0],"t1","l")
+    lgd.AddEntry(res_21apr.GetNvsTime[1],"t2","l")
+    lgd.Draw()
+    c.Draw()
+    '''
+    """
+    c = r.TCanvas(cvname,cvname,*cvsize)
+    c.Divide(*cvarr)
+
+    for i in range(Nplots):
+        c.cd(i+1)
+        plot = arrofPlots[i]
+        if (plotrangeX):
+            plot.GetXaxis().SetRangeUser(*plotrangeX)
+        if (plotrangeY):
+            plot.GetYaxis().SetRangeUser(*plotrangeY)
+        if (additional_codes):
+            exec(additional_codes)
+        plot.Draw(drawOpt)
+    
+    if (Draw):
+        c.Draw()
+    
+    return c
+
+
+
+
+
+def DrawDoublePlotsOnDividedCanvas(arrofPlots1,arrofPlots2,
+                Nplots=24,cvarr=(6,4),cvsize=(3600,2400),cvname="c",
+                plotrangeX=None,plotrangeY=None,drawOpt1="",drawOpt2="",
+                additional_codes=None,Draw=True):
+    """
+    # codes to reproduce the original plots
+    # c = r.TCanvas("c","c",3600,2400)
+    # c.Divide(6,4)
+
+    # for calonum in range(24):
+    #     c.cd(calonum+1)
+    #     raw_fft = res_21apr.Get_fft_raw[calonum]
+    #     fit_residual_fft = res_21apr.Get_fft_res[calonum]
+
+    #     raw_fft.GetYaxis().SetMaxDigits(3)
+    #     # raw_fft.GetYaxis().SetRangeUser(0,2e5)
+    #     raw_fft.GetYaxis().SetRangeUser(0, 1.05*raw_fft.GetBinContent(raw_fft.GetMaximumBin())) # GetMaximum dont work if you change the axis limits
+
+    #     raw_fft.SetLineColorAlpha(2,0.3)
+    #     raw_fft.Draw()
+    #     fit_residual_fft.Draw("same")
+    # c.Draw()
+    """
+    c = r.TCanvas(cvname,cvname,*cvsize)
+    c.Divide(*cvarr)
+
+    for i in range(Nplots):
+        c.cd(i+1)
+        plot1 = arrofPlots1[i]
+        plot2 = arrofPlots2[i]
+
+        if (plotrangeX):
+            plot1.GetXaxis().SetRangeUser(*plotrangeX)
+
+        if (plotrangeY):
+            plot1.GetYaxis().SetRangeUser(*plotrangeY)
+            
+        if (additional_codes):
+            exec(additional_codes)
+
+        plot1.Draw(drawOpt1)
+        plot2.Draw("same" + drawOpt2)
+
+    if (Draw):
+        c.Draw()
+    
+    return c
