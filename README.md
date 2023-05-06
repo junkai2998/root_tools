@@ -37,6 +37,14 @@ so the function should be called in this way:
 root_tools.ToolsCollection.fft(kwargs)
 ```
 
+note: this repo is meant to be portable for now, instead of a full package.
+so if you import from other path, do something like:
+```python
+import sys
+sys.path.append("path/root_tools/")
+from ToolsCollection import *
+```
+
 ## 1.3 or using alias: 
 ```python
 import root_tools.ToolsCollection as tools
