@@ -147,6 +147,8 @@ void identify_hist_peaks3(TH1D* hist,int maxpositions=3, double resolution=1.0,
 }
 
 
+
+
 TH1D* GetFitResidual(TH1D* hist, TF1* func, string name="residual", string title="residual (histo - func)"){
     TH1D* residual = new TH1D(name.c_str(),title.c_str(),hist->GetNbinsX(), hist->GetXaxis()->GetXmin() ,hist->GetXaxis()->GetXmax());
     residual->GetXaxis()->SetTitle(hist->GetXaxis()->GetTitle());
@@ -161,5 +163,27 @@ TH1D* GetFitResidual(TH1D* hist, TF1* func, string name="residual", string title
     
     return residual;
 }
+
+
+
+
+TH1D* GetFitPull(TH1D* hist, TF1* func, int nbinsx, double xlow, double xup, string name="pull", string title="Pull Distribution"){
+    /*
+    return the pull distribution, defined as (data-fit function)/binerr
+    what if the range is outside of the range ? become under/overflow ? can we retrieve them ?
+    */
+    TH1D* PullDist = new TH1D(name.c_str(),title.c_str(),nbinsx,xlow,xup);
+    PullDist->GetXaxis()->SetTitle("Pull: (Data - Fit Func)/Bin_err");
+    PullDist->GetYaxis()->SetTitle("N");
+    
+    for (int bin=0; bin < hist->GetNbinsX(); bin++){
+        double BinErr = hist->GetBinError(bin + 1);
+        double PullValue = (hist->GetBinContent(bin+1) - func->Eval(hist->GetBinCenter(bin+1)))/BinErr;
+        PullDist->Fill(PullValue);
+    };
+    
+    return PullDist;
+}
+
 
 #endif
