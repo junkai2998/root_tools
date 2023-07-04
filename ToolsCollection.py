@@ -380,7 +380,7 @@ def TransposePyArray(arr):
     return ArrNew
 
 
-def plot_diff(gr_sims,gr_data_fit,legends = ("gm2ringsim","Data Fit"),diff_ranges = (-11,11),legend_pos = (0.1, 0.77, 0.4, 0.90)):
+def plot_diff(gr_sims,gr_data_fit,legends = ("gm2ringsim","Data Fit"),plot_ranges=None,diff_ranges = (-11,11),legend_pos = (0.1, 0.77, 0.4, 0.90)):
     parname = gr_data_fit.GetTitle().split(" ")[0]
     # legends = ("gm2ringsim","Data Fit")
     # gr_sims = N0_vs_calo_gm2ringsim
@@ -400,7 +400,7 @@ def plot_diff(gr_sims,gr_data_fit,legends = ("gm2ringsim","Data Fit"),diff_range
 
 
     gr_rel_diff = r.TGraphErrors()
-    title = '{} difference ({} - {}) for Run {}'.format(parname,legends[0],legends[1],ds_name)
+    title = '{} difference ({} - {})'.format(parname,legends[0],legends[1])
     gr_rel_diff.SetTitle(title)
     gr_rel_diff.SetMarkerStyle(23)
     gr_rel_diff.SetMarkerColor(4)
@@ -440,7 +440,7 @@ def plot_diff(gr_sims,gr_data_fit,legends = ("gm2ringsim","Data Fit"),diff_range
     gr_rel_diff.GetYaxis().SetLabelSize(0.08);
     gr_rel_diff.GetYaxis().SetTitleSize(0.08);
     gr_rel_diff.GetYaxis().SetTitleOffset(0.4)
-    gr_rel_diff.GetYaxis().SetMaxDigits(2)
+    # gr_rel_diff.GetYaxis().SetMaxDigits(2)
     # r.gStyle.SetOptTitle(1)
     
 
@@ -462,9 +462,25 @@ def plot_diff(gr_sims,gr_data_fit,legends = ("gm2ringsim","Data Fit"),diff_range
     p1.Draw();
     p1.SetBottomMargin(0.01)
     p1.cd();
+    
+    # auto range
+    data_minY = r.TMath.MinElement(24,gr_data_fit.GetY())
+    data_maxY = r.TMath.MaxElement(24,gr_data_fit.GetY())
+    sim_minY  = r.TMath.MinElement(24,gr_sims.GetY())
+    sim_maxY  = r.TMath.MaxElement(24,gr_sims.GetY())
+    maxY = max(data_maxY,sim_maxY)
+    minY = min(data_minY,sim_minY)
+    # https://root-forum.cern.ch/t/tgraph-getmaximum/47679/2
+    # override auto ranges
+    if(plot_ranges):
+        minY,maxY = plot_ranges
+    
+    gr_data_fit.SetMarkerColor(1)
+    gr_sims.SetMarkerColor(2)
     gr_data_fit.Draw('APE')
     gr_sims.Draw('PE')
     gr_data_fit.GetXaxis().SetRangeUser(0,24.5)
+    gr_data_fit.GetYaxis().SetRangeUser(minY*0.99,maxY*1.01)
     gr_data_fit.GetXaxis().SetLabelOffset(999);
     gr_data_fit.GetXaxis().SetLabelSize(0);
     gr_data_fit.GetXaxis().SetTitleSize(0);
@@ -483,4 +499,3 @@ def plot_diff(gr_sims,gr_data_fit,legends = ("gm2ringsim","Data Fit"),diff_range
     # c.cd();
     c.Draw()
     return c #,gr_rel_diff
-    # c.Print("N0_vs_calo_fit_vs_gm2ringsim_run{}_{}_method.png".format(ds_name,ana_method))

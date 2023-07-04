@@ -67,7 +67,7 @@ ROOT.fft(kwargs)
 ```
 the following code also work. But I still need some times to understand the working of c++ compiler and root interpreter[^3]
 ```python
-r.gInterpreter.Declare('# include "ToolsCollection.h"')
+r.gInterpreter.Declare('# include "path/to/ToolsCollection.h"') // is path/to/* a good practice ?
 # r.gROOT.ProcessLine('# include "ToolsCollection.h"') # also work. but which one is more easy to move to compiled version ?
 ```
 
