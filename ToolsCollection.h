@@ -3,6 +3,9 @@
 
 #include <iostream>
 
+#include <TH1D.h>
+#include <TF1.h>
+
 using namespace std;
 
 TH1D* cut_th1d(TH1D* hist, int start_bin, int last_bin, string hist_name="histo_cut"){
@@ -65,7 +68,7 @@ TH1D* cut_th1d(TH1D* hist, int start_bin, int last_bin, string hist_name="histo_
 
 TH1D* fft(TH1D* hist, string fftname="default_fft_name", string given_title="FFT", double fstart=0.01){
     double bin_width = hist->GetBinWidth(1);
-    cout << bin_width << endl;
+    cout << "check bin width: " << bin_width << endl;
     
     TString title = Form("%s ;f [MHz]; FFT Magnitude [arb.]",given_title.c_str());
     
@@ -183,6 +186,41 @@ TH1D* GetFitPull(TH1D* hist, TF1* func, int nbinsx=100, double xlow=-5.0, double
     };
     
     return PullDist;
+}
+
+
+
+
+void GetFuncParNameValErrLim(TF1* func,double time_scale = 1000.0){
+//     const char* g = "wie !";
+//     cout << strlen(g) << endl;
+//     cout << string(9,'a') << endl;
+
+    double lmin;
+    double lmax;
+    double xmin;
+    double xmax;
+    double value;
+    double error;
+    int npars;
+    npars = func->GetNpar();
+    
+    func->GetRange(xmin,xmax); 
+    cout << "=========== Checking TF1 ===========" << endl;
+    cout << Form("function \"%s\" with %d pars, defined on: %f, %f", func->GetName(), npars, xmin/time_scale,xmax/time_scale) << endl;
+    cout << "idx - parname                 :    value    +/-    error    (limits)" << endl;
+    
+    for(int idx=0;idx<npars;idx++){
+    const char* name = func->GetParName(idx); 
+    value = func->GetParameter(idx);
+    error = func->GetParError(idx);
+    func->GetParLimits(idx,lmin,lmax); 
+    
+    // cout << Form("%02d - %s",idx+1, name) << 
+    // cout << Form("%02d - %s : %f +/- %f ( %f , %f) ",idx+1, name, value, error,lmin,lmax) << endl;
+    cout << Form("%02d - %s",idx+1, name) << string(24 - strlen(name),' ') << ": ";
+    cout << Form("%.3f +/- %.3f ( %.1f , %.1f) ", value, error,lmin,lmax) << endl;
+    }; 
 }
 
 
