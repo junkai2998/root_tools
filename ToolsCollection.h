@@ -191,22 +191,33 @@ TH1D* GetFitPull(TH1D* hist, TF1* func, int nbinsx=100, double xlow=-5.0, double
 
 
 
-void GetFuncParNameValErrLim(TF1* func,double time_scale = 1000.0){
-//     const char* g = "wie !";
-//     cout << strlen(g) << endl;
-//     cout << string(9,'a') << endl;
-
+void GetFuncParNameValErrLim(TF1* func,double time_scale){
+    // the original version: used for wiggle plot at [ns] time
+    // we cancelled the time_scale=1000 to remove ambiguity when overloading
+    // this mean you have to check the previous code and add (func,1000)
+    
+    //     const char* g = "wie !";
+    //     cout << strlen(g) << endl;
+    //     cout << string(9,'a') << endl;
+    
+    // function limits
     double lmin;
     double lmax;
+    
+    // parameters
     double xmin;
     double xmax;
     double value;
     double error;
     int npars;
-    npars = func->GetNpar();
     
-    func->GetRange(xmin,xmax); 
-    cout << "=========== Checking TF1 ===========" << endl;
+    npars = func->GetNpar();
+    func->GetRange(xmin,xmax);
+
+    cout << "=========== Checking TF1 (x= scaled time) ==========" << endl;
+    // note: the \"%s\" will cause problem when running in jupyter 
+    // with code="""""" and gInterpreter.Declare() or gROOTProcessLine()
+    // so use '%s' instead
     cout << Form("function \"%s\" with %d pars, defined on: %f, %f", func->GetName(), npars, xmin/time_scale,xmax/time_scale) << endl;
     cout << "idx - parname                 :    value    +/-    error    (limits)" << endl;
     
@@ -218,10 +229,76 @@ void GetFuncParNameValErrLim(TF1* func,double time_scale = 1000.0){
     
     // cout << Form("%02d - %s",idx+1, name) << 
     // cout << Form("%02d - %s : %f +/- %f ( %f , %f) ",idx+1, name, value, error,lmin,lmax) << endl;
-    cout << Form("%02d - %s",idx+1, name) << string(24 - strlen(name),' ') << ": ";
+    cout << Form("%02d  - %s",idx+1, name) << string(24 - strlen(name),' ') << ": ";
     cout << Form("%.3f +/- %.3f ( %.1f , %.1f) ", value, error,lmin,lmax) << endl;
     }; 
 }
 
+
+void GetFuncParNameValErrLim(TF1* func){
+    // overloaded version, without time scalling (more general)
+
+    // function limits
+    double lmin;
+    double lmax;
+    
+    // parameters
+    double xmin;
+    double xmax;
+    double value;
+    double error;
+    int npars;
+    
+    npars = func->GetNpar();
+    func->GetRange(xmin,xmax);
+
+    cout << "=========== Checking TF1 ===========" << endl;
+    cout << Form("function '%s' with %d pars, defined on: %f, %f", func->GetName(), npars, xmin,xmax) << endl;
+    cout << "idx - parname                 :    value    +/-    error    (limits)" << endl;
+    
+    for(int idx=0;idx<npars;idx++){
+    const char* name = func->GetParName(idx); 
+    value = func->GetParameter(idx);
+    error = func->GetParError(idx);
+    func->GetParLimits(idx,lmin,lmax); 
+
+    cout << Form("%02d  - %s",idx+1, name) << string(24 - strlen(name),' ') << ": ";
+    cout << Form("%.3f +/- %.3f ( %.1f , %.1f) ", value, error,lmin,lmax) << endl;
+    }; 
+}
+
+void GetFuncParNameValErrLim(TF2* func){
+    // the overloaded version for TF2
+
+    // function limits
+    double lmin;
+    double lmax;
+    
+    // parameters
+    double xmin;
+    double xmax;
+    double ymin;
+    double ymax;
+    double value;
+    double error;
+    int npars;
+    
+    npars = func->GetNpar();
+    func->GetRange(xmin,ymin,xmax,ymax);
+
+    cout << "=========== Checking TF2 ===========" << endl;
+    cout << Form("function '%s' with %d pars, defined on: (%f, %f),(%f,%f)", func->GetName(), npars, xmin,xmax,ymin,ymax) << endl;
+    cout << "idx - parname                 :    value    +/-    error    (limits)" << endl;
+    
+    for(int idx=0;idx<npars;idx++){
+    const char* name = func->GetParName(idx); 
+    value = func->GetParameter(idx);
+    error = func->GetParError(idx);
+    func->GetParLimits(idx,lmin,lmax); 
+
+    cout << Form("%02d  - %s",idx+1, name) << string(24 - strlen(name),' ') << ": ";
+    cout << Form("%.3f +/- %.3f ( %.1f , %.1f) ", value, error,lmin,lmax) << endl;
+    }; 
+}
 
 #endif
