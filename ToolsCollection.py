@@ -380,7 +380,7 @@ def TransposePyArray(arr):
     return ArrNew
 
 
-def plot_diff(gr_sims,gr_data_fit,legends = ("gm2ringsim","Data Fit"),plot_ranges=None,diff_ranges = (-11,11),legend_pos = (0.1, 0.77, 0.4, 0.90)):
+def plot_diff_old(gr_sims,gr_data_fit,legends = ("gm2ringsim","Data Fit"),plot_ranges=None,diff_ranges = (-11,11),legend_pos = (0.1, 0.77, 0.4, 0.90)):
     parname = gr_data_fit.GetTitle().split(" ")[0]
     # legends = ("gm2ringsim","Data Fit")
     # gr_sims = N0_vs_calo_gm2ringsim
@@ -435,7 +435,7 @@ def plot_diff(gr_sims,gr_data_fit,legends = ("gm2ringsim","Data Fit"),plot_range
     gr_rel_diff.GetXaxis().SetLabelSize(0.1);
     gr_rel_diff.GetXaxis().SetTitleSize(0.1);
     # title = '#frac{{{0} - {1}}}{{{1}}}  [%]'.format(legends[0],legends[1])
-    gr_rel_diff.GetYaxis().SetTitle('#frac{Sim - Fit}{Fit}  [%]   ')
+    gr_rel_diff.GetYaxis().SetTitle('#frac{Sim - Data}{Data}  [%]   ')
     gr_rel_diff.GetYaxis().SetRangeUser(*diff_ranges)
     gr_rel_diff.GetYaxis().SetLabelSize(0.08);
     gr_rel_diff.GetYaxis().SetTitleSize(0.08);
@@ -485,6 +485,136 @@ def plot_diff(gr_sims,gr_data_fit,legends = ("gm2ringsim","Data Fit"),plot_range
     gr_data_fit.GetXaxis().SetLabelSize(0);
     gr_data_fit.GetXaxis().SetTitleSize(0);
     gr_data_fit.GetYaxis().SetMaxDigits(2);
+
+    leg = r.TLegend(*legend_pos);
+    leg.SetFillColor(r.gPad.GetFillColor());
+    # leg.SetTextAlign(22);
+    leg.AddEntry(gr_sims, legends[0], "P");
+    leg.AddEntry(gr_data_fit,legends[1], "P");
+    leg.Draw();
+
+    p1.GetListOfPrimitives().Add(leg)
+
+
+    # c.cd();
+    c.Draw()
+    return c #,gr_rel_diff
+
+
+
+def plot_diff(gr_sims,gr_data_fit,legends = ("gm2ringsim","Data Fit"),plot_ranges=None,diff_ranges = (-11,11),legend_pos = (0.1, 0.77, 0.4, 0.90),ndiv=510):
+    parname = gr_data_fit.GetTitle().split(" ")[0]
+    # legends = ("gm2ringsim","Data Fit")
+    # gr_sims = N0_vs_calo_gm2ringsim
+    # gr_data_fit = N0_vs_calo
+    # legend_pos = (0.1, 0.77, 0.4, 0.90)
+    # diff_ranges = (-11,11)
+
+    '''
+    make sure you give appropriate title to the 'gr_data_fit', it will be the title of the plot
+    
+    make sure you have your parameter name in the title of the 'gr_data_fit'
+    put in front, separated by a space.
+    but as it will be the small plot's title and get obstructed by the another plot, so it is ok
+    
+    note: this does not take care of the error propagation
+    '''
+
+
+    gr_rel_diff = r.TGraphErrors()
+    title = '{} difference ({} - {})'.format(parname,legends[0],legends[1])
+    gr_rel_diff.SetTitle(title)
+    gr_rel_diff.SetMarkerStyle(23)
+    gr_rel_diff.SetMarkerColor(4)
+    gr_rel_diff.GetXaxis().SetTitle('Calo Number')
+    gr_rel_diff.GetYaxis().SetTitle('relative difference [%]')
+
+    for calo_num in range(24):
+        data_fit_val = gr_data_fit.GetPointY(calo_num)
+        sims_val = gr_sims.GetPointY(calo_num)
+
+        diff_abs = sims_val - data_fit_val
+        diff_rel = diff_abs/data_fit_val*100 # percent
+
+        gr_rel_diff.SetPoint(gr_rel_diff.GetN(),calo_num+1,diff_rel)
+
+
+    r.gStyle.SetTitleX(0.2)
+    r.gStyle.SetTitleW(0.6)
+    r.gStyle.SetTitleH(0.06)
+    c = r.TCanvas("c","c",800,800) 
+
+    # draw the bottom first
+    p2 = r.TPad("p2", "", 0, 0, 1, 0.35);
+    # p2.SetFillColor(3)
+    p2.SetGrid(1,0);
+    p2.Draw();
+    p2.cd();
+    p2.SetBottomMargin(0.2)
+    p2.GetListOfPrimitives().Add(gr_rel_diff)
+    gr_rel_diff.Draw('APE')
+    gr_rel_diff.GetXaxis().SetRangeUser(0,24.5)
+    gr_rel_diff.GetXaxis().SetLabelSize(0.1);
+    gr_rel_diff.GetXaxis().SetTitleSize(0.1);
+    # title = '#frac{{{0} - {1}}}{{{1}}}  [%]'.format(legends[0],legends[1])
+    gr_rel_diff.GetYaxis().SetTitle('#frac{Sim - Data}{Data}  [%]   ')
+    gr_rel_diff.GetYaxis().SetRangeUser(*diff_ranges)
+    gr_rel_diff.GetYaxis().SetLabelSize(0.08);
+    gr_rel_diff.GetYaxis().SetTitleSize(0.08);
+    gr_rel_diff.GetYaxis().SetTitleOffset(0.6)
+    gr_rel_diff.SetMarkerSize(1.3)
+    # gr_rel_diff.GetYaxis().SetMaxDigits(2)
+    # r.gStyle.SetOptTitle(1)
+
+    gr_rel_diff.GetYaxis().SetNdivisions(ndiv)
+    
+
+
+    # N0_rel_diff.SetTitle(0)
+    line = r.TLine(0,0,24.5,0) # x1, y1, x2, y2
+    line.SetLineStyle(9)
+    line.SetLineWidth(2)
+    line.SetLineColor(1)
+    line.Draw()
+    gr_rel_diff.GetListOfFunctions().Add(line)
+
+
+    c.cd() # go back to the largest canvas and make another pad
+    # draw the upper pad later, used to cover up the bottom title
+    p1 = r.TPad("p1", "", 0, 0.32, 1, 1); #  xlow, ylow, xup, yup
+    p1.SetGrid();
+    # p1.SetFillColor(2)
+    p1.Draw();
+    p1.SetBottomMargin(0.01)
+    p1.cd();
+    
+    # auto range
+    data_minY = r.TMath.MinElement(24,gr_data_fit.GetY())
+    data_maxY = r.TMath.MaxElement(24,gr_data_fit.GetY())
+    sim_minY  = r.TMath.MinElement(24,gr_sims.GetY())
+    sim_maxY  = r.TMath.MaxElement(24,gr_sims.GetY())
+    maxY = max(data_maxY,sim_maxY)
+    minY = min(data_minY,sim_minY)
+    # https://root-forum.cern.ch/t/tgraph-getmaximum/47679/2
+    # override auto ranges
+    if(plot_ranges):
+        minY,maxY = plot_ranges
+    
+    gr_data_fit.SetMarkerColor(1)
+    gr_sims.SetMarkerColor(2)
+    gr_data_fit.SetMarkerSize(1.3)
+    gr_sims.SetMarkerSize(1.3)
+    gr_data_fit.Draw('APE')
+    gr_sims.Draw('PE')
+    gr_data_fit.GetXaxis().SetRangeUser(0,24.5)
+    gr_data_fit.GetYaxis().SetRangeUser(minY*0.99,maxY*1.01)
+    gr_data_fit.GetXaxis().SetLabelOffset(999);
+    gr_data_fit.GetXaxis().SetLabelSize(0);
+    gr_data_fit.GetXaxis().SetTitleSize(0);
+    gr_data_fit.GetYaxis().SetMaxDigits(2);
+    gr_data_fit.GetYaxis().SetLabelSize(0.055);
+    gr_data_fit.GetYaxis().SetTitleSize(0.055);
+    gr_data_fit.GetYaxis().SetTitleOffset(0.78)
 
     leg = r.TLegend(*legend_pos);
     leg.SetFillColor(r.gPad.GetFillColor());
