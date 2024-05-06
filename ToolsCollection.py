@@ -542,15 +542,20 @@ def plot_diff(gr_sims,gr_data_fit,legends = ("gm2ringsim","Data Fit"),plot_range
     r.gStyle.SetTitleX(0.2)
     r.gStyle.SetTitleW(0.6)
     r.gStyle.SetTitleH(0.06)
-    c = r.TCanvas("c","c",800,800) 
+    c = r.TCanvas("c","c",800,800)
+    # c.SetFillColorAlpha(2,0.2) # debug
+    # c.SetBorderSize(6) # debug
+    # c.SetHighLightColor(2) # debug
 
     # draw the bottom first
     p2 = r.TPad("p2", "", 0, 0, 1, 0.35);
-    # p2.SetFillColor(3)
+    # p2.SetFillColorAlpha(3,0.1) # debug
     p2.SetGrid(1,0);
     p2.Draw();
     p2.cd();
-    p2.SetBottomMargin(0.2)
+    p2.SetBottomMargin(0.23)
+    p2.SetLeftMargin(0.11)
+    p2.SetRightMargin(0.023)
     p2.GetListOfPrimitives().Add(gr_rel_diff)
     gr_rel_diff.Draw('APE')
     gr_rel_diff.GetXaxis().SetRangeUser(0,24.5)
@@ -567,8 +572,8 @@ def plot_diff(gr_sims,gr_data_fit,legends = ("gm2ringsim","Data Fit"),plot_range
     # r.gStyle.SetOptTitle(1)
 
     gr_rel_diff.GetYaxis().SetNdivisions(ndiv)
+    gr_rel_diff.GetXaxis().SetNdivisions(210)
     
-
 
     # N0_rel_diff.SetTitle(0)
     line = r.TLine(0,0,24.5,0) # x1, y1, x2, y2
@@ -582,10 +587,12 @@ def plot_diff(gr_sims,gr_data_fit,legends = ("gm2ringsim","Data Fit"),plot_range
     c.cd() # go back to the largest canvas and make another pad
     # draw the upper pad later, used to cover up the bottom title
     p1 = r.TPad("p1", "", 0, 0.32, 1, 1); #  xlow, ylow, xup, yup
-    p1.SetGrid();
-    # p1.SetFillColor(2)
+    p1.SetGrid();c
+    # p1.SetFillColorAlpha(4,0.1) # debug
     p1.Draw();
     p1.SetBottomMargin(0.01)
+    p1.SetLeftMargin(0.11)
+    p1.SetRightMargin(0.023)
     p1.cd();
     
     # auto range
@@ -607,6 +614,7 @@ def plot_diff(gr_sims,gr_data_fit,legends = ("gm2ringsim","Data Fit"),plot_range
     gr_data_fit.Draw('APE')
     gr_sims.Draw('PE')
     gr_data_fit.GetXaxis().SetRangeUser(0,24.5)
+    gr_data_fit.GetXaxis().SetNdivisions(210)
     gr_data_fit.GetYaxis().SetRangeUser(minY*0.99,maxY*1.01)
     gr_data_fit.GetXaxis().SetLabelOffset(999);
     gr_data_fit.GetXaxis().SetLabelSize(0);
@@ -614,10 +622,10 @@ def plot_diff(gr_sims,gr_data_fit,legends = ("gm2ringsim","Data Fit"),plot_range
     gr_data_fit.GetYaxis().SetMaxDigits(2);
     gr_data_fit.GetYaxis().SetLabelSize(0.055);
     gr_data_fit.GetYaxis().SetTitleSize(0.055);
-    gr_data_fit.GetYaxis().SetTitleOffset(0.78)
+    gr_data_fit.GetYaxis().SetTitleOffset(0.95)
 
     leg = r.TLegend(*legend_pos);
-    leg.SetFillColor(r.gPad.GetFillColor());
+    leg.SetFillColorAlpha(0,1) #r.gPad.GetFillColor()); 
     # leg.SetTextAlign(22);
     leg.AddEntry(gr_sims, legends[0], "P");
     leg.AddEntry(gr_data_fit,legends[1], "P");
@@ -625,6 +633,19 @@ def plot_diff(gr_sims,gr_data_fit,legends = ("gm2ringsim","Data Fit"),plot_range
 
     p1.GetListOfPrimitives().Add(leg)
 
+
+    c.cd();
+    patch = r.TPaveText(); # for use with NDC
+    patch.SetBorderSize(0)
+    # patch.SetFillColor(2) # debug
+    patch.SetFillColorAlpha(0,1)
+    patch.SetX1NDC(0.0)
+    patch.SetY1NDC(0.3)
+    patch.SetX2NDC(0.108)
+    patch.SetY2NDC(0.35)
+    patch.Draw()
+
+    c.GetListOfPrimitives().Add(patch)
 
     # c.cd();
     c.Draw()
